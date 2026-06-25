@@ -1,0 +1,100 @@
+<div class="chat-bubble">
+    <!-- Chat Window -->
+    <div class="chat-bubble-window" id="chatBubbleWindow">
+        <div class="chat-bubble-header">
+            <h6><i class="fas fa-robot"></i> AI Assistant</h6>
+            <button class="chat-bubble-close" onclick="toggleChatBubble()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-bubble-messages" id="chatBubbleMessages">
+            <div class="text-center text-muted" id="bubbleLoading">
+                <i class="fas fa-spinner fa-spin"></i> Loading...
+            </div>
+        </div>
+        <div class="chat-bubble-input">
+            <input type="text" id="bubbleMessageInput" placeholder="Type your message..." 
+                   onkeypress="if(event.key==='Enter') sendBubbleMessage()">
+            <button onclick="sendBubbleMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Toggle Button -->
+    <button class="chat-bubble-button" onclick="toggleChatBubble()">
+        <i class="fas fa-comment"></i>
+    </button>
+</div>
+
+<script>
+let bubbleOpen = false;
+
+function toggleChatBubble() {
+    bubbleOpen = !bubbleOpen;
+    const window = document.getElementById('chatBubbleWindow');
+    window.classList.toggle('active');
+    if (bubbleOpen) loadBubbleHistory();
+}
+
+async function sendBubbleMessage() {
+    const input = document.getElementById('bubbleMessageInput');
+    const message = input.value.trim();
+    if (!message) return;
+    
+    input.value = '';
+    displayBubbleMessage(message, 'user');
+    
+    const btn = document.querySelector('.chat-bubble-input button');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    try {
+        const response = await fetch('/api/chat/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        });
+        
+        const data = await response.json();
+        if (data.bot_response) {
+            displayBubbleMessage(data.bot_response.message, 'bot');
+        }
+    } catch (error) {
+        displayBubbleMessage("Sorry, I'm having trouble connecting.", 'bot');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    }
+}
+
+function displayBubbleMessage(message, sender) {
+    const div = document.createElement('div');
+    div.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+    div.textContent = message;
+    document.getElementById('chatBubbleMessages').appendChild(div);
+    const messagesDiv = document.getElementById('chatBubbleMessages');
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+async function loadBubbleHistory() {
+    try {
+        const response = await fetch('/api/chat/history');
+        const data = await response.json();
+        const messagesDiv = document.getElementById('chatBubbleMessages');
+        messagesDiv.innerHTML = '';
+        
+        if (data.messages && data.messages.length > 0) {
+            data.messages.forEach(msg => {
+                displayBubbleMessage(msg.message, msg.sender_type);
+            });
+        } else {
+            displayBubbleMessage("Hello! How can I help you?", 'bot');
+        }
+        const loading = document.getElementById('bubbleLoading');
+        if (loading) loading.remove();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+</script>

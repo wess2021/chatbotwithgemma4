@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-8 offset-md-2">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4><i class="fas fa-comment-dots"></i> Chat with Our Assistant</h4>
+            </div>
+            <div class="card-body">
+                <div id="chatMessages" class="chat-messages">
+                    <div class="text-center text-muted" id="loadingMessage">
+                        <i class="fas fa-spinner fa-spin"></i> Loading conversation...
+                    </div>
+                </div>
+                
+                <div class="chat-input mt-3">
+                    <div class="input-group">
+                        <input type="text" id="messageInput" class="form-control" 
+                               placeholder="Type your message..." 
+                               onkeypress="if(event.key==='Enter') sendMessage()">
+                        <button id="sendButton" class="btn btn-primary" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <small>
+                    <i class="fas fa-robot"></i> Powered by Google Gemini AI
+                    <span class="float-end">
+                        <button class="btn btn-sm btn-outline-danger" onclick="clearChat()">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="closeChat()">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                    </span>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let chatMessages = document.getElementById('chatMessages');
+
+// Load chat history
+async function loadHistory() {
+    try {
+        const response = await fetch('/api/chat/history');
+        const data = await response.json();
+        
+        chatMessages.innerHTML = '';
+        
+        if (data.messages && data.messages.length > 0) {
+            data.messages.forEach(msg => {
+                displayMessage(msg.message, msg.sender_type);
+            });
+        } else {
+            displayMessage("Hello! How can I help you today?", 'bot');
+        }
+        
+        const loading = document.getElementById('loadingMessage');
+        if (loading) loading.remove();
+        scrollToBottom();
+        
+    } catch (error) {
+        console.error('Error loading history:', error);
+        displayMessage("Welcome! How can I assist you today?", 'bot');
+        const loading = document.getElementById('loadingMessage');
+        if (loading) loading.remove();
+    }
+}
+
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    if (!message) return;
+    
+    input.value = '';
+    displayMessage(message, 'user');
+    
+    const sendBtn = document.getElementById('sendButton');
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    try {
+        const response = await fetch('/api/chat/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        });
+        
+        const data = await response.json();
+        
+        if (data.bot_response) {
+            displayMessage(data.bot_response.message, 'bot');
+        } else if (data.error) {
+            displayMessage("I'm sorry, I encountered an error. Please try again.", 'bot');
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        displayMessage("I'm sorry, I'm having trouble connecting. Please try again later.", 'bot');
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send';
+        scrollToBottom();
+    }
+}
+
+function displayMessage(message, sender) {
+    const div = document.createElement('div');
+    div.className = `message ${sender === 'user' ? 'user-message' : 'bot-message'}`;
+    div.textContent = message;
+    chatMessages.appendChild(div);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function clearChat() {
+    if (confirm('Are you sure you want to clear the chat?')) {
+        try {
+            const response = await fetch('/api/chat/clear', { method: 'POST' });
+            if (response.ok) {
+                chatMessages.innerHTML = '';
+                displayMessage("Chat cleared. How can I help you?", 'bot');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+}
+
+async function closeChat() {
+    if (confirm('Close the chat session?')) {
+        try {
+            const response = await fetch('/api/chat/close', { method: 'POST' });
+            if (response.ok) {
+                window.location.href = '/';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+}
+
+// Load history on page load
+document.addEventListener('DOMContentLoaded', loadHistory);
+</script>
+{% endblock %}

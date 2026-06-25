@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - E-Commerce{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-md-8 offset-md-2">
+        <div class="jumbotron bg-light p-5 rounded">
+            <h1 class="display-4">Welcome to Our Store!</h1>
+            <p class="lead">We have the best products at the best prices.</p>
+            <hr class="my-4">
+            <p>Explore our products and ask our AI assistant for help!</p>
+            <a class="btn btn-primary btn-lg" href="/chat" role="button">
+                <i class="fas fa-comment-dots"></i> Open Chat
+            </a>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-shipping-fast fa-3x text-primary"></i>
+                        <h5 class="card-title mt-3">Fast Shipping</h5>
+                        <p class="card-text">Free shipping on orders over $50</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-headset fa-3x text-success"></i>
+                        <h5 class="card-title mt-3">24/7 Support</h5>
+                        <p class="card-text">Our AI assistant is always here to help</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-undo fa-3x text-warning"></i>
+                        <h5 class="card-title mt-3">Easy Returns</h5>
+                        <p class="card-text">30-day money-back guarantee</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

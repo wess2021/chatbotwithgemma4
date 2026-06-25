@@ -1,0 +1,32 @@
+# Flask Configuration
+FLASK_APP=run.py
+FLASK_ENV=development
+SECRET_KEY=your-secret-key-here-change-in-production-12345
+
+# Database Configuration (for MySQL)
+DB_HOST=localhost
+DB_USER=username
+DB_PASSWORD=your password
+DB_NAME=ecommerceapp
+DB_PORT=3306
+
+# OpenRouter API (Use this instead of Gemini)
+OPENROUTER_API_KEY=your api key
+
+# Choose one of these free models:
+# - google/gemma-4-31b-it:free  (Best, 31B parameters)
+# - google/gemma-4-26b-a4b-it:free  (26B parameters, efficient)
+# - openrouter/free  (Auto-selects best free model)
+OPENROUTER_MODEL=google/gemma-4-31b-it:free
+
+# Optional: Your website URL for OpenRouter
+SITE_URL=http://localhost:5000
+
+# Session Configuration
+SESSION_TYPE=filesystem
+SESSION_PERMANENT=False
+SESSION_USE_SIGNER=True
+
+# Application Configuration
+DEBUG=True
+CHAT_HISTORY_LIMIT=50

@@ -2,17 +2,16 @@ from app import db
 from datetime import datetime
 
 class ChatSession(db.Model):
-    """Chat session model"""
     __tablename__ = 'chat_sessions'
     
-    session_id = db.Column(db.String(255), primary_key=True)
+    # Changed from 255 to 191 for MySQL compatibility
+    session_id = db.Column(db.String(191), primary_key=True)
     user_id = db.Column(db.Integer, nullable=True)
-    visitor_id = db.Column(db.String(255), nullable=True)
+    visitor_id = db.Column(db.String(191), nullable=True)  # Also reduced
     status = db.Column(db.String(50), default='active')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
     messages = db.relationship('ChatMessage', backref='session', lazy=True, cascade='all, delete-orphan')
     context = db.relationship('ChatContext', backref='session', uselist=False, cascade='all, delete-orphan')
     
@@ -27,11 +26,10 @@ class ChatSession(db.Model):
         }
 
 class ChatMessage(db.Model):
-    """Chat message model"""
     __tablename__ = 'chat_messages'
     
     id = db.Column(db.Integer, primary_key=True)
-    session_id = db.Column(db.String(255), db.ForeignKey('chat_sessions.session_id'), nullable=False)
+    session_id = db.Column(db.String(191), db.ForeignKey('chat_sessions.session_id'), nullable=False)  # Changed to 191
     sender_type = db.Column(db.Enum('user', 'bot', 'admin'), default='user')
     message = db.Column(db.Text, nullable=False)
     intent = db.Column(db.String(100), nullable=True)
@@ -50,10 +48,9 @@ class ChatMessage(db.Model):
         }
 
 class ChatContext(db.Model):
-    """Chat context model"""
     __tablename__ = 'chat_context'
     
-    session_id = db.Column(db.String(255), db.ForeignKey('chat_sessions.session_id'), primary_key=True)
+    session_id = db.Column(db.String(191), db.ForeignKey('chat_sessions.session_id'), primary_key=True)  # Changed to 191
     current_intent = db.Column(db.String(100), nullable=True)
     last_action = db.Column(db.String(100), nullable=True)
     context_data = db.Column(db.JSON, nullable=True)

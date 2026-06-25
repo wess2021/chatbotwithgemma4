@@ -14,8 +14,8 @@ class Config:
     DB_NAME = os.environ.get('DB_NAME', 'ecommerceapp')
     DB_PORT = os.environ.get('DB_PORT', 3306)
     
-    # Gemini API
-    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+    # OpenRouter API
+    OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
     
     # Session
     SESSION_TYPE = 'filesystem'
@@ -28,8 +28,8 @@ class Config:
     
     @staticmethod
     def get_database_uri():
-        """Get database connection URI"""
-        return f"mysql+pymysql://{Config.DB_USER}:{Config.DB_PASSWORD}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8mb4"
+        """Get database connection URI using utf8 to avoid key length issues"""
+        return f"mysql+pymysql://{Config.DB_USER}:{Config.DB_PASSWORD}@{Config.DB_HOST}:{Config.DB_PORT}/{Config.DB_NAME}?charset=utf8"
 
 config = {
     'development': Config,

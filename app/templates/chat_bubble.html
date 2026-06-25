@@ -12,6 +12,11 @@
                 <i class="fas fa-spinner fa-spin"></i> Loading...
             </div>
         </div>
+        <div id="quickRepliesContainer" class="quick-replies-container" style="display: none; padding: 10px; background: #f8f9fa; border-top: 1px solid #dee2e6;">
+    <div id="quickReplies" class="d-flex flex-wrap gap-2" style="gap: 8px;">
+        <!-- Les tickets seront ajoutés ici dynamiquement -->
+    </div>
+</div>
         <div class="chat-bubble-input">
             <input type="text" id="bubbleMessageInput" placeholder="Type your message..." 
                    onkeypress="if(event.key==='Enter') sendBubbleMessage()">
